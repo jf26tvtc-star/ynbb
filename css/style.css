@@ -425,6 +425,9 @@ footer {
     margin-top: 70px;
 }
 footer p { margin: 4px 0; }
+.footer-admin { margin-top: 10px !important; }
+.footer-admin a { font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.footer-admin a:hover { color: #fff; }
 
 /* ==================== STATIC SITE (GitHub Pages) ==================== */
 .empty-note { text-align: center; color: var(--muted); padding: 40px; }

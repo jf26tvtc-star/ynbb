@@ -132,6 +132,7 @@ $typeLabels = [
         <div class="container">
             <p>&copy; 2026 روح ينبع | جميع الحقوق محفوظة</p>
             <p>📧 jf26tvtc@gmail.com | 📱 +96656789455</p>
+            <p class="footer-admin"><a href="admin/dashboard.php">لوحة التحكم</a></p>
         </div>
     </footer>
 </body>

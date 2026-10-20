@@ -80,6 +80,7 @@ $title = $destination !== null ? $destination['name'] : 'الوجهة غير م�
         <div class="container">
             <p>&copy; 2026 روح ينبع | جميع الحقوق محفوظة</p>
             <a href="contact.php">تواصل معنا</a>
+            <p class="footer-admin"><a href="admin/dashboard.php">لوحة التحكم</a></p>
         </div>
     </footer>
 </body>
