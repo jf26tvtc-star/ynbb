@@ -1,18 +1,13 @@
 <?php
-// إعدادات الاتصال
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "yanbu_tourism";
+// الاتصال: يقرأ الإعدادات من متغيرات البيئة على Vercel، ويستخدم إعدادات XAMPP الافتراضية محليًا
+require_once __DIR__ . '/includes/database.php';
 
-// الاتصال
-$conn = new mysqli($servername, $username, $password, $database);
-
-if ($conn->connect_error) {
-    die("خطأ في الاتصال: " . $conn->connect_error);
+try {
+    $conn = yanbu_db();
+} catch (mysqli_sql_exception $e) {
+    error_log('Database connection failed: ' . $e->getMessage());
+    yanbu_render_unavailable(yanbu_is_serverless() ? '' : $e->getMessage());
 }
-
-$conn->set_charset("utf8mb4");
 
 // دالة لتنظيف المدخلات (trim فقط — الحماية من SQL تتم عبر prepared statements،
 // والحماية من XSS تتم عند العرض باستخدام htmlspecialchars)
@@ -70,6 +65,35 @@ function maps_open_url($googleMapsUrl, $placeName, $location) {
 // (استدعها مع بادئة المسار المناسبة: "images/" في الصفحات الرئيسية أو "../images/" في لوحة التحكم)
 function place_image($path) {
     return $path !== '' ? $path : 'placeholder.svg';
+}
+
+// حفظ صورة مرفوعة: في مجلد images محليًا، أو داخل قاعدة البيانات على Vercel (نظام ملفاته مؤقت وللقراءة فقط)
+function store_place_image($tmpPath, $filename, $mime) {
+    if (yanbu_is_serverless()) {
+        $data = file_get_contents($tmpPath);
+        if ($data === false) return false;
+        $stmt = yanbu_db()->prepare('INSERT INTO image_files (name, mime, data) VALUES (?, ?, ?)');
+        $stmt->bind_param('sss', $filename, $mime, $data);
+        return $stmt->execute();
+    }
+    return move_uploaded_file($tmpPath, __DIR__ . '/images/' . $filename);
+}
+
+// عند تجاوز حجم الطلب الحد المسموح، يفرّغ PHP بيانات النموذج بالكامل؛ نكتشف ذلك لنعرض رسالة واضحة
+function upload_too_large() {
+    return ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && empty($_POST) && empty($_FILES) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0;
+}
+
+function delete_place_image_file($filename) {
+    $filename = basename($filename);
+    if (yanbu_is_serverless()) {
+        $stmt = yanbu_db()->prepare('DELETE FROM image_files WHERE name = ?');
+        $stmt->bind_param('s', $filename);
+        $stmt->execute();
+        return;
+    }
+    $file = __DIR__ . '/images/' . $filename;
+    if ($filename !== 'placeholder.svg' && is_file($file)) @unlink($file);
 }
 
 // دالة للتحقق من جلسة الأدمن (تستخدم مسارًا نسبيًا ليعمل أيًا كان اسم مجلد المشروع)

@@ -14,6 +14,25 @@
 4) افتح http://localhost/yanbu-tourism/
 5) دخول الأدمن: admin / admin123
 
+النشر على Vercel (الموقع مبني بـ PHP + MySQL، وVercel لا يشغّلهما افتراضيًا):
+- vercel.json يشغّل PHP عبر vercel-php، وكل الطلبات تمر على api/index.php الذي يشغّل الصفحة المطلوبة
+  ويمنع الوصول لملفات الكود والـ SQL ومجلد includes وأداة admin/diagnose.php.
+- على Vercel تُحفظ جلسات تسجيل الدخول والصور المرفوعة داخل قاعدة البيانات (جدولا sessions و image_files)
+  لأن ملفات Vercel مؤقتة. محليًا على XAMPP يبقى كل شيء كما هو (ملفات الجلسات ومجلد images).
+- حجم الطلب على Vercel محدود بحوالي 4.5MB، فارفع صورًا مجموعها أقل من 4MB في المرة الواحدة.
+
+خطوات التشغيل:
+1) أنشئ قاعدة MySQL خارجية مجانية (مثل TiDB Cloud Serverless: https://tidbcloud.com)، ثم من Connect
+   انسخ: Host و Port و User و Password، وأنشئ قاعدة باسم yanbu_tourism (أو استخدم الاسم الموجود).
+2) في Vercel: Project > Settings > Environment Variables أضف:
+   DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+   (أو DATABASE_URL بصيغة mysql://user:pass@host:port/dbname). يُفعَّل TLS تلقائيًا لأي خادم غير محلي؛
+   لخادم يحتاج شهادة خاصة أضف DB_SSL_CA بمسار الشهادة، أو DB_SSL=false لتعطيله.
+   وأضف مؤقتًا SETUP_TOKEN برمز سري طويل (12 حرفًا على الأقل).
+3) أعد النشر (Deployments > Redeploy)، ثم افتح https://<موقعك>/setup.php وأدخل SETUP_TOKEN
+   وكلمة مرور جديدة للمدير. تنشئ الصفحة الجداول والتصنيفات وحساب admin ووجهة مهرجان الزهور، ولا تحذف أي بيانات.
+4) احذف SETUP_TOKEN من متغيرات Vercel وأعد النشر لتعطيل صفحة التهيئة، ثم سجّل الدخول من /admin/.
+
 إذا عندك النسخة القديمة ذات 3 جداول وتريد الاحتفاظ ببياناتها:
 - خذ Export احتياطي أولاً.
 - استورد upgrade_from_3_tables.sql بدل database.sql.

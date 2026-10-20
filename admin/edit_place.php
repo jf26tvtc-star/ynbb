@@ -16,7 +16,9 @@ $success = '';
 $error = '';
 $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (upload_too_large()) {
+    $error = 'حجم الصور المرفوعة أكبر من المسموح. ارفع صورًا أصغر (المجموع أقل من 4MB في المرة الواحدة).';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $category_id = (int)($_POST['category_id'] ?? 0);
     $location = trim($_POST['location'] ?? '');
@@ -40,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             $filename = uniqid('place_', true) . '.' . $allowed[$mime];
-            $uploadedFiles[] = ['tmp' => $tmp, 'name' => $filename];
+            $uploadedFiles[] = ['tmp' => $tmp, 'name' => $filename, 'mime' => $mime];
         }
     }
 
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($uploadedFiles)) {
                 $hasMain = (bool)$conn->query('SELECT 1 FROM images WHERE place_id=' . (int)$id . ' AND is_main=1')->fetch_row();
                 foreach ($uploadedFiles as $f) {
-                    if (move_uploaded_file($f['tmp'], '../images/' . $f['name'])) {
+                    if (store_place_image($f['tmp'], $f['name'], $f['mime'])) {
                         $main = $hasMain ? 0 : 1;
                         $im = $conn->prepare('INSERT INTO images (place_id, image_path, is_main) VALUES (?, ?, ?)');
                         $im->bind_param('isi', $id, $f['name'], $main);
@@ -113,7 +115,7 @@ $images = $imgRes->get_result();
 <input type="url" name="google_maps_url" placeholder="رابط خرائط قوقل (اختياري)" value="<?=htmlspecialchars($place['google_maps_url'] ?? '')?>">
 <input type="text" name="phone" placeholder="رقم الهاتف (اختياري)" value="<?=htmlspecialchars($place['phone'] ?? '')?>">
 <textarea name="description" rows="7" required><?=htmlspecialchars($place['description'])?></textarea>
-<label style="display:block;margin:10px 0 6px;color:#555;">إضافة صور جديدة (اختياري، يمكن اختيار أكثر من صورة)</label>
+<label style="display:block;margin:10px 0 6px;color:#555;">إضافة صور جديدة (اختياري، يمكن اختيار أكثر من صورة، ويُفضّل ألا يتجاوز مجموعها 4MB في المرة الواحدة)</label>
 <input type="file" name="images[]" accept="image/jpeg,image/png,image/webp" multiple>
 <button class="btn">حفظ التعديلات</button>
 </form>

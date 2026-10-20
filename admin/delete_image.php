@@ -22,8 +22,7 @@ if ($id > 0 && $place_id > 0) {
             $d = $conn->prepare('DELETE FROM images WHERE id=? AND place_id=?');
             $d->bind_param('ii', $id, $place_id);
             if ($d->execute()) {
-                $file = '../images/' . basename($img['image_path']);
-                if (is_file($file)) @unlink($file);
+                delete_place_image_file($img['image_path']);
                 // إذا كانت الصورة المحذوفة هي الرئيسية، نجعل أقدم صورة متبقية رئيسية بدلاً منها
                 if ($img['is_main']) {
                     $next = $conn->query('SELECT id FROM images WHERE place_id=' . $place_id . ' ORDER BY id ASC LIMIT 1')->fetch_assoc();
