@@ -6,3 +6,4 @@ exclude:
   - "*.sql"
   - "*.txt"
   - "data/*.tmp"
+  - worker

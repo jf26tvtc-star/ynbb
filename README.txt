@@ -36,6 +36,25 @@
   - "تذكرني على هذا الجهاز" يحفظ الدخول في المتصفح؛ لا تستخدمه على جهاز عام أو مشترك.
 - الملفات: admin.html + js/admin.js + css/admin-dashboard.css.
 
+لوحة مفتوحة للجميع بدون دخول (عبر خدمة وسيط Cloudflare Worker مجانية):
+- لماذا الوسيط؟ الحفظ يحتاج مفتاح GitHub، ولا يجوز وضعه في كود الموقع العام (GitHub يلغيه تلقائيًا،
+  ومن يملكه يستطيع رفع أي ملف على النطاق). الوسيط يحتفظ بالمفتاح كسرّ، ولا يقبل إلا بيانات الموقع
+  بعد التحقق منها وصور JPG حقيقية؛ يرفض أي أكواد أو صفحات أو حذف ملفات الموقع.
+- تنبيه: في هذا الوضع يستطيع أي زائر تعديل الأماكن والتصنيفات وحذفها (على مسؤولية صاحب الموقع).
+  كل تعديل محفوظ في سجل GitHub ويمكن استرجاعه.
+- الإعداد مرة واحدة:
+  1) أنشئ حساب Cloudflare مجاني: https://dash.cloudflare.com/sign-up
+  2) Workers & Pages > Create > Start with Hello World > الاسم ynbb-admin > Deploy.
+  3) Edit code: احذف الكود الموجود والصق محتوى worker/worker.js
+     (https://raw.githubusercontent.com/jf26tvtc-star/ynbb/main/worker/worker.js) ثم Deploy.
+  4) أنشئ مفتاح GitHub (Fine-grained) لمستودع ynbb فقط بصلاحية Contents: Read and write.
+  5) في الـ Worker: Settings > Variables and Secrets > Add > Type: Secret، الاسم GITHUB_TOKEN والقيمة المفتاح > Deploy.
+  6) ضع رابط الـ Worker (مثل https://ynbb-admin.xxxx.workers.dev) في data/admin-config.json:
+     { "worker_url": "https://ynbb-admin.xxxx.workers.dev" }
+     بعدها تفتح لوحة التحكم مباشرة للجميع بدون أي دخول.
+- لإيقاف الوضع المفتوح: اجعل worker_url فارغًا في data/admin-config.json (ترجع اللوحة لكلمة المرور).
+- تحديث أرقام نسخ CSS/JS بعد تعديلها: C:\xampp\php\php.exe tools\stamp-assets.php
+
 ملاحظة: لوحة التحكم المحلية (admin/ على XAMPP) تعدّل قاعدة البيانات المحلية فقط ولا تؤثر على الموقع المنشور.
 
 إذا عندك النسخة القديمة ذات 3 جداول وتريد الاحتفاظ ببياناتها:

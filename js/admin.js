@@ -29,6 +29,8 @@
     var token = null;
     var data = null;
     var passwordSet = false;
+    var workerUrl = ''; // عند ضبطه في data/admin-config.json تعمل اللوحة مفتوحة بدون دخول عبر خدمة الوسيط
+    var CONFIG_PATH = 'data/admin-config.json';
     var previews = {};   // معاينات الصور المرفوعة في هذه الجلسة (قبل أن ينشرها GitHub Pages)
     var draftImages = []; // الصور الجديدة المختارة في نموذج المكان
 
@@ -225,6 +227,7 @@
     }
 
     async function fetchLatest() {
+        if (workerUrl) return workerRequest('/data');
         var ref = await gh('/git/ref/heads/' + BRANCH);
         var head = ref.object.sha;
         var file = await gh('/contents/' + DATA_PATH + '?ref=' + head);
@@ -251,8 +254,53 @@
         return err;
     }
 
+    // طلب لخدمة الوسيط (Cloudflare Worker) في الوضع المفتوح
+    async function workerRequest(path, body) {
+        var res = await fetch(workerUrl + path, {
+            method: body ? 'POST' : 'GET',
+            headers: body ? { 'Content-Type': 'application/json' } : {},
+            body: body ? JSON.stringify(body) : undefined,
+            cache: 'no-store'
+        });
+        var json = await res.json().catch(function () { return {}; });
+        if (!res.ok) {
+            var err = userError(json.error || 'تعذّر الاتصال بخدمة الحفظ (HTTP ' + res.status + ').');
+            err.workerStatus = res.status;
+            throw err;
+        }
+        return json;
+    }
+
+    async function commitViaWorker(message, mutate, newFiles) {
+        for (var attempt = 0; attempt < 3; attempt++) {
+            var latest = await fetchLatest();
+            var next = JSON.parse(JSON.stringify(latest.data));
+            normalize(next);
+            var result = mutate(next) || {};
+            normalize(next);
+            try {
+                await workerRequest('/save', {
+                    base: latest.head,
+                    message: message,
+                    data: next,
+                    images: (newFiles || []).map(function (f) { return { name: f.name, base64: f.base64 }; }),
+                    remove: result.removeImages || []
+                });
+                data = next;
+                updateCounts();
+                $('sync-status').textContent = 'آخر حفظ: ' + new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+                return result;
+            } catch (err) {
+                // تغيّر المستودع أثناء الحفظ (تعديل من شخص آخر): نعيد المحاولة على أحدث نسخة
+                if (err.workerStatus !== 409) throw err;
+            }
+        }
+        throw userError('تعذّر الحفظ بسبب تعديل متزامن من مكان آخر. حدّث الصفحة وحاول مرة أخرى.');
+    }
+
     // حفظ تعديل كـ commit واحد: يرفع الصور الجديدة، ثم يطبّق التعديل على أحدث نسخة من البيانات (لتجنب فقدان تعديلات أخرى)
     async function commitChange(message, mutate, newFiles) {
+        if (workerUrl) return commitViaWorker(message, mutate, newFiles);
         var uploaded = [];
         for (var i = 0; i < (newFiles || []).length; i++) {
             var blob = await gh('/git/blobs', { method: 'POST', body: { content: newFiles[i].base64, encoding: 'base64' } });
@@ -330,7 +378,9 @@
                     if (!blob) { reject(userError('تعذّر تجهيز الصورة "' + file.name + '".')); return; }
                     var reader = new FileReader();
                     reader.onload = function () {
-                        var rand = Math.random().toString(16).slice(2, 8);
+                        var rand = Array.prototype.map.call(crypto.getRandomValues(new Uint8Array(3)), function (b) {
+                            return b.toString(16).padStart(2, '0');
+                        }).join('');
                         resolve({
                             name: 'place_' + Date.now().toString(36) + '_' + rand + '.jpg',
                             base64: String(reader.result).split(',')[1],
@@ -361,7 +411,7 @@
         var hash = window.location.hash.replace('#', '') || 'overview';
         var match = hash.match(/^place-edit-(\d+)$/);
         var view = match ? 'place-edit' : hash;
-        if (!TITLES[view]) view = 'overview';
+        if (!TITLES[view] || (view === 'settings' && workerUrl)) view = 'overview';
         $('crumb').textContent = TITLES[view];
         document.title = TITLES[view] + ' - لوحة التحكم - روح ينبع';
         document.querySelectorAll('[data-nav]').forEach(function (a) {
@@ -410,7 +460,7 @@
 
     function renderOverview() {
         var s = data.stats;
-        var passwordHint = passwordSet ? '' : '<div class="alert alert-danger panel-hint">لم تُعيَّن كلمة مرور للوحة بعد. ' +
+        var passwordHint = passwordSet || workerUrl ? '' : '<div class="alert alert-danger panel-hint">لم تُعيَّن كلمة مرور للوحة بعد. ' +
             '<a href="#settings">عيّن كلمة مرور</a> لتدخل بها من أي جهاز بدل مفتاح GitHub.</div>';
         $('view').innerHTML = heading('لوحة التحكم', 'كل ما تعدّله هنا يُنشر على الموقع تلقائيًا.') + passwordHint +
             '<section class="dash-welcome"><div class="dash-welcome-content"><span class="dash-welcome-label"><span></span> مساحة إدارة روح ينبع</span>' +
@@ -812,7 +862,44 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    // الوضع المفتوح: تفتح اللوحة مباشرة للجميع، والحفظ يمر عبر خدمة الوسيط التي تتحقق من البيانات
+    async function startOpen() {
+        setBusy(true, 'جارٍ تحميل البيانات...');
+        document.querySelectorAll('#logout-link, [data-nav="settings"]').forEach(function (el) { el.hidden = true; });
+        $('profile-name').textContent = 'لوحة مفتوحة';
+        try {
+            var latest = await fetchLatest();
+            data = normalize(latest.data);
+            $('login-view').hidden = true;
+            $('app-view').hidden = false;
+            updateCounts();
+            route();
+        } catch (err) {
+            $('login-view').hidden = false;
+            $('password-form').hidden = true;
+            $('token-login').hidden = true;
+            var box = $('password-error');
+            box.textContent = friendlyError(err);
+            box.hidden = false;
+            box.parentNode.removeChild(box);
+            $('login-view').querySelector('.panel-muted').after(box);
+        }
+        setBusy(false);
+    }
+
+    async function loadConfig() {
+        try {
+            var res = await fetch(CONFIG_PATH, { cache: 'no-cache' });
+            if (!res.ok) return '';
+            var config = await res.json();
+            var url = String(config.worker_url || '').trim().replace(/\/+$/, '');
+            return /^https:\/\/[A-Za-z0-9.-]+(\/[A-Za-z0-9._~\/-]*)?$/.test(url) ? url : '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
         $('token-link').href = TOKEN_URL;
         $('password-form').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -834,6 +921,11 @@
         });
         window.addEventListener('hashchange', route);
 
+        workerUrl = await loadConfig();
+        if (workerUrl) {
+            startOpen();
+            return;
+        }
         var saved = storedToken();
         if (saved) start(saved, false, false, 'password-error');
         else $('login-view').hidden = false;
