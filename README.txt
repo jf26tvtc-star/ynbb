@@ -12,23 +12,28 @@
 2) شغّل Apache و MySQL (يفضّل PHP 8.1 فأعلى).
 3) من phpMyAdmin استورد database.sql (ملاحظة: هذا يعيد إنشاء جداول المشروع).
 4) افتح http://localhost/yanbu-tourism/
-5) دخول الأدمن: admin / admin123 (لوحة التحكم محلية على XAMPP: http://localhost/yanbu-tourism/admin/)
+5) دخول الأدمن المحلي: admin / admin123 (http://localhost/yanbu-tourism/admin/)
 
-النشر على GitHub Pages (https://jf26tvtc-star.github.io/ynbb/):
-- GitHub Pages يعرض ملفات ثابتة فقط ولا يشغّل PHP أو MySQL، لذلك للموقع نسختان:
-  1) الموقع العام الثابت: index.html, places.html, details.html, categories.html, destination.html,
-     trip.html, about.html, contact.html + js/site.js، ويقرأ المحتوى من data/site.json.
-  2) لوحة التحكم (admin/) وصفحات PHP: تعمل محليًا على XAMPP فقط، ولا تُنشر (انظر _config.yml).
+الموقع على GitHub Pages (https://jf26tvtc-star.github.io/ynbb/):
+- GitHub Pages يعرض ملفات ثابتة فقط ولا يشغّل PHP أو MySQL، لذلك الموقع المنشور صفحات HTML:
+  index.html, places.html, details.html, categories.html, destination.html, trip.html, about.html, contact.html
+  تعرضها js/site.js من ملف البيانات data/site.json (الأماكن والتصنيفات والصور).
 - نموذج التواصل في contact.html يرسل الرسائل إلى jf26tvtc@gmail.com عبر خدمة FormSubmit المجانية.
   أول رسالة تصل يرسل FormSubmit بريد تفعيل إلى هذا العنوان؛ اضغط Activate فيه مرة واحدة لتبدأ الرسائل بالوصول.
-- المعاينة محليًا: http://localhost/yanbu-tourism/index.html
 
-نشر أي تعديل (بعد إضافة/تعديل الأماكن أو الصور من لوحة التحكم):
-- من لوحة التحكم: "نشر الموقع" > "نشر الآن" (يصدّر البيانات ويرفعها إلى GitHub)، أو
-- انقر نقرًا مزدوجًا على publish.bat في مجلد المشروع (يحتاج تشغيل MySQL في XAMPP).
-- يظهر التحديث على الموقع خلال دقيقة إلى دقيقتين.
-- تصدير البيانات فقط بدون رفع: C:\xampp\php\php.exe tools\export.php
-- يُفضّل أن تكون الصور المرفوعة صغيرة الحجم (أقل من 1MB تقريبًا) لأنها تُرفع ضمن مستودع GitHub.
+لوحة التحكم على الموقع (https://jf26tvtc-star.github.io/ynbb/admin.html) — تعمل من أي جهاز:
+- رابطها موجود في فوتر كل صفحة ("لوحة التحكم").
+- تضيف وتعدّل وتحذف الأماكن والتصنيفات، وترفع الصور (تُصغَّر تلقائيًا)، وتحفظ مباشرة في مستودع GitHub
+  (data/site.json ومجلد images) عبر GitHub API؛ يظهر التعديل للزوار خلال دقيقة إلى دقيقتين.
+- الدخول بمفتاح GitHub (Fine-grained token) مرة واحدة لكل جهاز:
+  1) من صفحة الدخول اضغط "صفحة إنشاء المفتاح في GitHub" (الإعدادات معبّأة مسبقًا).
+  2) Repository access: اختر Only select repositories ثم ynbb.
+  3) تأكد أن Contents = Read and write ثم Generate token، وانسخ المفتاح والصقه في صفحة الدخول.
+  - "تذكرني على هذا الجهاز" يحفظ المفتاح في المتصفح؛ لا تستخدمه على جهاز عام أو مشترك.
+  - من يملك المفتاح يستطيع تعديل الموقع: لا تشاركه، وإذا تسرّب احذفه من إعدادات GitHub وأنشئ غيره.
+- الملفات: admin.html + js/admin.js + css/admin-dashboard.css.
+
+ملاحظة: لوحة التحكم المحلية (admin/ على XAMPP) تعدّل قاعدة البيانات المحلية فقط ولا تؤثر على الموقع المنشور.
 
 إذا عندك النسخة القديمة ذات 3 جداول وتريد الاحتفاظ ببياناتها:
 - خذ Export احتياطي أولاً.

@@ -356,12 +356,6 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
-        // عند التصفح المحلي على XAMPP يفتح رابط "لوحة التحكم" في الفوتر لوحة نفس المجلد
-        if (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)) {
-            document.querySelectorAll('a[data-admin-link]').forEach(function (link) {
-                link.href = 'admin/dashboard.php';
-            });
-        }
         var init = pages[document.body.getAttribute('data-page')];
         if (init) init();
     });

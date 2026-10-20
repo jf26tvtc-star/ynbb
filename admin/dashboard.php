@@ -78,7 +78,7 @@ function dashboard_icon($name) {
                     <a href="places-list.php">إدارة الأماكن <span class="dash-nav-count"><?= $places_count ?></span></a>
                     <a href="add_place.php">إضافة مكان جديد</a>
                     <a href="categories.php">التصنيفات <span class="dash-nav-count"><?= $categories_count ?></span></a>
-                    <a href="publish.php">نشر الموقع</a>
+                    <a href="https://jf26tvtc-star.github.io/ynbb/admin.html" target="_blank" rel="noopener">لوحة التحكم على الموقع</a>
                 </div>
             </details>
             <details class="dash-menu-group" open>
@@ -96,9 +96,9 @@ function dashboard_icon($name) {
             </details>
         </nav>
         <div class="dash-sidebar-note">
-            <strong>انشر تحديثاتك</strong>
-            <p>بعد إضافة أو تعديل الأماكن، انشرها لتظهر للزوار على GitHub Pages.</p>
-            <a href="publish.php">نشر الموقع</a>
+            <strong>لوحة الموقع المنشور</strong>
+            <p>هذه اللوحة محلية. لتعديل الموقع المنشور للزوار استخدم لوحة التحكم على الموقع.</p>
+            <a href="https://jf26tvtc-star.github.io/ynbb/admin.html" target="_blank" rel="noopener">فتح لوحة الموقع</a>
         </div>
     </aside>
 
@@ -145,7 +145,7 @@ function dashboard_icon($name) {
                 <a href="places-list.php"><?= dashboard_icon('pin') ?> إدارة الأماكن</a>
                 <a href="categories.php"><?= dashboard_icon('tag') ?> إدارة التصنيفات</a>
                 <a href="messages.php"><?= dashboard_icon('mail') ?> متابعة الرسائل</a>
-                <a href="publish.php"><?= dashboard_icon('globe') ?> نشر الموقع</a>
+                <a href="https://jf26tvtc-star.github.io/ynbb/admin.html" target="_blank" rel="noopener"><?= dashboard_icon('globe') ?> لوحة الموقع</a>
             </section>
 
             <div class="dash-content-grid">

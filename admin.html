@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - روح ينبع</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="css/style.css?v=1c04abbb">
+    <link rel="stylesheet" href="css/admin-dashboard.css?v=bb2a5484">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-page">
+    <!-- شاشة الدخول -->
+    <main class="panel-login" id="login-view" hidden>
+        <div class="panel-login-card">
+            <h1>روح ينبع<small>لوحة التحكم</small></h1>
+            <p class="panel-muted">تحفظ اللوحة التعديلات مباشرة في مستودع الموقع على GitHub، لذلك تحتاج "مفتاح دخول" من حسابك في GitHub (مرة واحدة لكل جهاز).</p>
+            <form id="login-form" autocomplete="off">
+                <label for="token-input">مفتاح الدخول (GitHub Token)</label>
+                <input id="token-input" type="password" required placeholder="github_pat_..." dir="ltr" spellcheck="false">
+                <label class="panel-check"><input type="checkbox" id="remember-input"> تذكرني على هذا الجهاز</label>
+                <div class="alert alert-danger" id="login-error" hidden></div>
+                <button class="dash-button dash-button-primary panel-wide" type="submit" id="login-btn">دخول</button>
+            </form>
+            <details class="panel-help">
+                <summary>كيف أحصل على مفتاح الدخول؟</summary>
+                <ol>
+                    <li>افتح <a id="token-link" href="#" target="_blank" rel="noopener">صفحة إنشاء المفتاح في GitHub</a> (الإعدادات معبّأة مسبقًا).</li>
+                    <li>في <b>Repository access</b> اختر <b>Only select repositories</b> ثم اختر <b>ynbb</b>.</li>
+                    <li>تأكد أن <b>Contents</b> = <b>Read and write</b>، ثم اضغط <b>Generate token</b>.</li>
+                    <li>انسخ المفتاح (يبدأ بـ github_pat_) والصقه هنا.</li>
+                </ol>
+                <p class="panel-muted">احتفظ بالمفتاح في مكان آمن ولا تشاركه مع أحد؛ من يملكه يستطيع تعديل الموقع.</p>
+            </details>
+            <a class="panel-back" href="index.html">العودة إلى الموقع</a>
+        </div>
+    </main>
+
+    <!-- اللوحة -->
+    <div id="app-view" hidden>
+        <aside class="dash-sidebar">
+            <a class="dash-brand" href="#overview">روح ينبع<small>لوحة إدارة الوجهات</small></a>
+            <nav class="dash-menu" aria-label="القائمة الرئيسية للإدارة">
+                <a class="dash-menu-home" href="#overview" data-nav="overview">نظرة عامة</a>
+                <details class="dash-menu-group" open>
+                    <summary>المحتوى</summary>
+                    <div class="dash-menu-links">
+                        <a href="#places" data-nav="places">إدارة الأماكن <span class="dash-nav-count" id="nav-places">0</span></a>
+                        <a href="#place-new" data-nav="place-new">إضافة مكان جديد</a>
+                        <a href="#categories" data-nav="categories">التصنيفات <span class="dash-nav-count" id="nav-categories">0</span></a>
+                    </div>
+                </details>
+                <details class="dash-menu-group" open>
+                    <summary>التواصل</summary>
+                    <div class="dash-menu-links">
+                        <a href="#messages" data-nav="messages">رسائل الزوار</a>
+                    </div>
+                </details>
+                <details class="dash-menu-group">
+                    <summary>الحساب</summary>
+                    <div class="dash-menu-links">
+                        <a href="index.html" target="_blank" rel="noopener">زيارة الموقع</a>
+                        <a class="dash-menu-logout" href="#" id="logout-link">تسجيل الخروج</a>
+                    </div>
+                </details>
+            </nav>
+            <div class="dash-sidebar-note">
+                <strong>كيف تظهر التعديلات؟</strong>
+                <p>كل حفظ يُرفع للموقع مباشرة، ويظهر للزوار خلال دقيقة إلى دقيقتين.</p>
+                <a href="#place-new">إضافة وجهة</a>
+            </div>
+        </aside>
+
+        <div class="dash-workspace">
+            <header class="dash-topbar">
+                <div class="dash-breadcrumb">الإدارة <span>/</span> <strong id="crumb">نظرة عامة</strong></div>
+                <div class="dash-topbar-actions">
+                    <span class="panel-sync" id="sync-status"></span>
+                    <div class="dash-profile"><span class="dash-avatar">م</span><div><strong id="profile-name">المسؤول</strong><small>مدير الموقع</small></div></div>
+                </div>
+            </header>
+            <main class="dash-main" id="view" tabindex="-1"></main>
+        </div>
+    </div>
+
+    <div class="panel-toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <div class="panel-busy" id="busy" hidden><div><span class="panel-spinner"></span><p id="busy-text">جارٍ الحفظ...</p></div></div>
+
+    <script src="js/admin.js?v=86890839"></script>
+</body>
+</html>
