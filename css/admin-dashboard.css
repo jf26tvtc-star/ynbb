@@ -359,6 +359,9 @@
 .panel-info { padding: 26px; display: grid; gap: 12px; }
 .panel-info h2 { font-size: 16px; color: var(--d-navy-800); }
 .panel-info p { font-size: 13px; line-height: 2; color: var(--d-text); }
+.panel-hint { margin-bottom: 18px; font-size: 13px; }
+.panel-hint a { font-weight: 700; text-decoration: underline !important; }
+.panel-narrow { max-width: 560px; }
 
 @media (max-width: 1050px) {
     .panel-columns { grid-template-columns: minmax(0, 1fr); }

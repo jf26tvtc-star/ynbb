@@ -6,7 +6,7 @@
     <title>لوحة التحكم - روح ينبع</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="css/style.css?v=1c04abbb">
-    <link rel="stylesheet" href="css/admin-dashboard.css?v=bb2a5484">
+    <link rel="stylesheet" href="css/admin-dashboard.css?v=6c282428">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body class="dashboard-page">
@@ -14,23 +14,31 @@
     <main class="panel-login" id="login-view" hidden>
         <div class="panel-login-card">
             <h1>روح ينبع<small>لوحة التحكم</small></h1>
-            <p class="panel-muted">تحفظ اللوحة التعديلات مباشرة في مستودع الموقع على GitHub، لذلك تحتاج "مفتاح دخول" من حسابك في GitHub (مرة واحدة لكل جهاز).</p>
+            <p class="panel-muted">أدخل كلمة مرور لوحة التحكم للمتابعة.</p>
+            <form id="password-form" autocomplete="on">
+                <label for="password-input">كلمة المرور</label>
+                <input id="password-input" type="password" required autocomplete="current-password">
+                <label class="panel-check"><input type="checkbox" id="remember-password"> تذكرني على هذا الجهاز</label>
+                <div class="alert alert-danger" id="password-error" hidden></div>
+                <button class="dash-button dash-button-primary panel-wide" type="submit">دخول</button>
+            </form>
+            <details class="panel-help" id="token-login">
+                <summary>الدخول بمفتاح GitHub (لأول مرة أو إذا نسيت كلمة المرور)</summary>
+                <p class="panel-muted">ادخل بالمفتاح مرة واحدة، ثم عيّن كلمة المرور من "الحساب ← كلمة مرور الدخول".</p>
             <form id="login-form" autocomplete="off">
                 <label for="token-input">مفتاح الدخول (GitHub Token)</label>
                 <input id="token-input" type="password" required placeholder="github_pat_..." dir="ltr" spellcheck="false">
                 <label class="panel-check"><input type="checkbox" id="remember-input"> تذكرني على هذا الجهاز</label>
                 <div class="alert alert-danger" id="login-error" hidden></div>
-                <button class="dash-button dash-button-primary panel-wide" type="submit" id="login-btn">دخول</button>
+                <button class="dash-button dash-button-primary panel-wide" type="submit" id="login-btn">دخول بالمفتاح</button>
             </form>
-            <details class="panel-help">
-                <summary>كيف أحصل على مفتاح الدخول؟</summary>
                 <ol>
                     <li>افتح <a id="token-link" href="#" target="_blank" rel="noopener">صفحة إنشاء المفتاح في GitHub</a> (الإعدادات معبّأة مسبقًا).</li>
                     <li>في <b>Repository access</b> اختر <b>Only select repositories</b> ثم اختر <b>ynbb</b>.</li>
                     <li>تأكد أن <b>Contents</b> = <b>Read and write</b>، ثم اضغط <b>Generate token</b>.</li>
                     <li>انسخ المفتاح (يبدأ بـ github_pat_) والصقه هنا.</li>
                 </ol>
-                <p class="panel-muted">احتفظ بالمفتاح في مكان آمن ولا تشاركه مع أحد؛ من يملكه يستطيع تعديل الموقع.</p>
+                <p class="panel-muted">لا تشارك المفتاح مع أحد؛ من يملكه يستطيع تعديل الموقع.</p>
             </details>
             <a class="panel-back" href="index.html">العودة إلى الموقع</a>
         </div>
@@ -60,6 +68,7 @@
                     <summary>الحساب</summary>
                     <div class="dash-menu-links">
                         <a href="index.html" target="_blank" rel="noopener">زيارة الموقع</a>
+                        <a href="#settings" data-nav="settings">كلمة مرور الدخول</a>
                         <a class="dash-menu-logout" href="#" id="logout-link">تسجيل الخروج</a>
                     </div>
                 </details>
@@ -86,6 +95,6 @@
     <div class="panel-toast" id="toast" role="status" aria-live="polite" hidden></div>
     <div class="panel-busy" id="busy" hidden><div><span class="panel-spinner"></span><p id="busy-text">جارٍ الحفظ...</p></div></div>
 
-    <script src="js/admin.js?v=86890839"></script>
+    <script src="js/admin.js?v=be9b0315"></script>
 </body>
 </html>

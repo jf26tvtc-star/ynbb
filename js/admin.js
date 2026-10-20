@@ -6,6 +6,10 @@
     var REPO = 'ynbb';
     var BRANCH = 'main';
     var DATA_PATH = 'data/site.json';
+    // مفتاح GitHub مشفّرًا بكلمة مرور اللوحة (AES-GCM + PBKDF2). لا يمكن فكّه بدون كلمة المرور.
+    var KEY_PATH = 'data/admin-key.json';
+    var PBKDF2_ITERATIONS = 600000;
+    var MIN_PASSWORD = 8;
     var API = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
     var TOKEN_KEY = 'yanbu_admin_token';
     var MAX_IMAGES = 10;
@@ -24,6 +28,7 @@
 
     var token = null;
     var data = null;
+    var passwordSet = false;
     var previews = {};   // معاينات الصور المرفوعة في هذه الجلسة (قبل أن ينشرها GitHub Pages)
     var draftImages = []; // الصور الجديدة المختارة في نموذج المكان
 
@@ -165,6 +170,60 @@
         return new TextDecoder('utf-8').decode(bytes);
     }
 
+    // ===================== كلمة مرور اللوحة (تشفير مفتاح GitHub) =====================
+    function bytesToB64(bytes) {
+        var bin = '';
+        new Uint8Array(bytes).forEach(function (b) { bin += String.fromCharCode(b); });
+        return btoa(bin);
+    }
+
+    function b64ToBytes(b64) {
+        var bin = atob(b64);
+        var bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return bytes;
+    }
+
+    async function deriveKey(password, salt, iterations) {
+        var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+        return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' },
+            base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    }
+
+    async function encryptToken(secret, password) {
+        var salt = crypto.getRandomValues(new Uint8Array(16));
+        var iv = crypto.getRandomValues(new Uint8Array(12));
+        var key = await deriveKey(password, salt, PBKDF2_ITERATIONS);
+        var cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(secret));
+        return { version: 1, kdf: 'PBKDF2-SHA256', iterations: PBKDF2_ITERATIONS, salt: bytesToB64(salt), iv: bytesToB64(iv), data: bytesToB64(cipher) };
+    }
+
+    async function decryptToken(box, password) {
+        var key = await deriveKey(password, b64ToBytes(box.salt), box.iterations);
+        try {
+            var plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToBytes(box.iv) }, key, b64ToBytes(box.data));
+            return new TextDecoder().decode(plain);
+        } catch (e) {
+            throw userError('كلمة المرور غير صحيحة.');
+        }
+    }
+
+    // قراءة ملف المفتاح المشفّر من GitHub مباشرة (أحدث نسخة)، ومن الموقع المنشور كبديل
+    async function fetchKeyBox() {
+        try {
+            var res = await fetch(API + '/contents/' + KEY_PATH + '?ref=' + BRANCH, { headers: { 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
+            if (res.status === 404) return null;
+            if (res.ok) {
+                var file = await res.json();
+                return JSON.parse(base64ToText(file.content));
+            }
+        } catch (e) { /* نجرب نسخة الموقع المنشور */ }
+        var fallback = await fetch(KEY_PATH, { cache: 'no-cache' });
+        if (fallback.status === 404) return null;
+        if (!fallback.ok) throw userError('تعذّر التحقق من كلمة المرور حاليًا. حاول بعد قليل.');
+        return fallback.json();
+    }
+
     async function fetchLatest() {
         var ref = await gh('/git/ref/heads/' + BRANCH);
         var head = ref.object.sha;
@@ -206,7 +265,8 @@
             var result = mutate(next) || {};
             normalize(next);
 
-            var tree = [{ path: DATA_PATH, mode: '100644', type: 'blob', content: JSON.stringify(next, null, 4) + '\n' }];
+            var tree = result.skipData ? [] : [{ path: DATA_PATH, mode: '100644', type: 'blob', content: JSON.stringify(next, null, 4) + '\n' }];
+            (result.files || []).forEach(function (f) { tree.push({ path: f.path, mode: '100644', type: 'blob', content: f.content }); });
             uploaded.forEach(function (f) { tree.push({ path: f.path, mode: '100644', type: 'blob', sha: f.sha }); });
             var removals = result.removeImages || [];
             if (removals.length) {
@@ -289,7 +349,7 @@
     }
 
     // ===================== العرض =====================
-    var TITLES = { overview: 'نظرة عامة', places: 'إدارة الأماكن', 'place-new': 'إضافة مكان', 'place-edit': 'تعديل مكان', categories: 'التصنيفات', messages: 'رسائل الزوار' };
+    var TITLES = { overview: 'نظرة عامة', places: 'إدارة الأماكن', 'place-new': 'إضافة مكان', 'place-edit': 'تعديل مكان', categories: 'التصنيفات', messages: 'رسائل الزوار', settings: 'كلمة مرور الدخول' };
 
     function updateCounts() {
         $('nav-places').textContent = data.places.length;
@@ -316,7 +376,8 @@
             'place-new': function () { renderPlaceForm(null); },
             'place-edit': function () { renderPlaceForm(parseInt(match[1], 10)); },
             categories: renderCategories,
-            messages: renderMessages
+            messages: renderMessages,
+            settings: renderSettings
         }[view];
         render();
         $('view').focus({ preventScroll: true });
@@ -349,7 +410,9 @@
 
     function renderOverview() {
         var s = data.stats;
-        $('view').innerHTML = heading('لوحة التحكم', 'كل ما تعدّله هنا يُنشر على الموقع تلقائيًا.') +
+        var passwordHint = passwordSet ? '' : '<div class="alert alert-danger panel-hint">لم تُعيَّن كلمة مرور للوحة بعد. ' +
+            '<a href="#settings">عيّن كلمة مرور</a> لتدخل بها من أي جهاز بدل مفتاح GitHub.</div>';
+        $('view').innerHTML = heading('لوحة التحكم', 'كل ما تعدّله هنا يُنشر على الموقع تلقائيًا.') + passwordHint +
             '<section class="dash-welcome"><div class="dash-welcome-content"><span class="dash-welcome-label"><span></span> مساحة إدارة روح ينبع</span>' +
             '<h2>أهلًا بك، رحلة أجمل تبدأ من هنا</h2><p>أضف الوجهات وصورها ورتّب التصنيفات من أي جهاز.<br>تظهر التعديلات للزوار خلال دقيقة إلى دقيقتين.</p>' +
             '<div class="dash-welcome-actions"><a href="#place-new" class="dash-button dash-button-gold">+ إضافة مكان جديد</a>' +
@@ -626,6 +689,49 @@
             '<a class="dash-button panel-secondary" href="contact.html" target="_blank" rel="noopener">صفحة التواصل</a></div></section>';
     }
 
+    function renderSettings() {
+        $('view').innerHTML = heading('كلمة مرور الدخول', passwordSet ? 'كلمة المرور مفعّلة. يمكنك تغييرها من هنا.' : 'عيّن كلمة مرور لتدخل بها من أي جهاز بدون مفتاح GitHub.') +
+            '<form class="dash-panel panel-form panel-narrow" id="password-setup" autocomplete="off">' +
+            '<label>كلمة المرور الجديدة *<input name="password" type="password" required minlength="' + MIN_PASSWORD + '" autocomplete="new-password"></label>' +
+            '<label>تأكيد كلمة المرور *<input name="confirm" type="password" required minlength="' + MIN_PASSWORD + '" autocomplete="new-password"></label>' +
+            '<p class="panel-muted">استخدم ' + MIN_PASSWORD + ' أحرف على الأقل، ويُفضّل خلط حروف وأرقام ورموز. ' +
+            'تُستخدم كلمة المرور لقفل مفتاح GitHub الحالي وحفظه مشفّرًا في الموقع، فلا يستطيع أحد فكّه بدونها.</p>' +
+            '<p class="panel-muted">إذا انتهت صلاحية مفتاح GitHub أو غيّرته: ادخل بالمفتاح الجديد ثم عيّن كلمة المرور من هنا مرة أخرى.</p>' +
+            '<div class="alert alert-danger" id="password-setup-error" hidden></div>' +
+            '<div class="panel-actions"><button class="dash-button dash-button-primary" type="submit">حفظ كلمة المرور</button></div></form>';
+
+        var form = $('password-setup');
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var password = form.elements.namedItem('password').value;
+            var confirm = form.elements.namedItem('confirm').value;
+            var errorBox = $('password-setup-error');
+            errorBox.hidden = true;
+            var problem = password.length < MIN_PASSWORD ? 'كلمة المرور يجب أن تكون ' + MIN_PASSWORD + ' أحرف على الأقل.'
+                : password !== confirm ? 'كلمتا المرور غير متطابقتين.' : '';
+            if (problem) {
+                errorBox.textContent = problem;
+                errorBox.hidden = false;
+                return;
+            }
+            setBusy(true, 'جارٍ حفظ كلمة المرور...');
+            try {
+                var box = await encryptToken(token, password);
+                await commitChange('Update admin panel password', function () {
+                    return { skipData: true, files: [{ path: KEY_PATH, content: JSON.stringify(box, null, 4) + '\n' }] };
+                });
+                passwordSet = true;
+                form.reset();
+                toast('تم حفظ كلمة المرور ✓ يمكنك الآن الدخول بها من أي جهاز.');
+                window.location.hash = '#overview';
+            } catch (err) {
+                errorBox.textContent = friendlyError(err);
+                errorBox.hidden = false;
+            }
+            setBusy(false);
+        });
+    }
+
     // ===================== الدخول والخروج =====================
     function storedToken() {
         try { return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY); } catch (e) { return null; }
@@ -635,15 +741,18 @@
         try { sessionStorage.removeItem(TOKEN_KEY); localStorage.removeItem(TOKEN_KEY); } catch (e) { /* التخزين غير متاح */ }
         token = null;
         data = null;
+        passwordSet = false;
         $('app-view').hidden = true;
         $('login-view').hidden = false;
         $('token-input').value = '';
+        $('password-input').value = '';
     }
 
-    async function start(candidate, remember, fromForm) {
+    async function start(candidate, remember, fromForm, errorBoxId) {
         token = candidate;
-        var errorBox = $('login-error');
-        errorBox.hidden = true;
+        var errorBox = $(errorBoxId || 'login-error');
+        $('login-error').hidden = true;
+        $('password-error').hidden = true;
         setBusy(true, 'جارٍ تحميل البيانات...');
         try {
             var user = await fetch('https://api.github.com/user', {
@@ -652,6 +761,13 @@
             }).then(function (res) { return res.ok ? res.json() : {}; });
             var latest = await fetchLatest();
             data = normalize(latest.data);
+            try {
+                await gh('/contents/' + KEY_PATH + '?ref=' + latest.head);
+                passwordSet = true;
+            } catch (err) {
+                if (err.status !== 404) throw err;
+                passwordSet = false;
+            }
             try {
                 sessionStorage.setItem(TOKEN_KEY, token);
                 if (remember) localStorage.setItem(TOKEN_KEY, token);
@@ -664,14 +780,45 @@
             route();
         } catch (err) {
             logout();
-            errorBox.textContent = friendlyError(err);
+            errorBox.textContent = err.status === 401 && errorBoxId === 'password-error'
+                ? 'مفتاح GitHub المحفوظ بكلمة المرور انتهت صلاحيته أو حُذف. ادخل بمفتاح جديد من الأسفل، ثم عيّن كلمة المرور من جديد.'
+                : friendlyError(err);
             errorBox.hidden = false;
+            if (errorBoxId === 'password-error' && err.status === 401) $('token-login').open = true;
         }
         setBusy(false);
     }
 
+    async function loginWithPassword(password, remember) {
+        var errorBox = $('password-error');
+        errorBox.hidden = true;
+        setBusy(true, 'جارٍ التحقق من كلمة المرور...');
+        var secret = null;
+        try {
+            var box = await fetchKeyBox();
+            if (!box) {
+                $('token-login').open = true;
+                throw userError('لم تُعيَّن كلمة مرور للوحة بعد. ادخل أول مرة بمفتاح GitHub من الأسفل، ثم عيّن كلمة المرور.');
+            }
+            secret = await decryptToken(box, password);
+        } catch (err) {
+            errorBox.textContent = friendlyError(err);
+            errorBox.hidden = false;
+        }
+        setBusy(false);
+        if (secret) {
+            $('password-input').value = '';
+            start(secret, remember, true, 'password-error');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         $('token-link').href = TOKEN_URL;
+        $('password-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var value = $('password-input').value;
+            if (value) loginWithPassword(value, $('remember-password').checked);
+        });
         $('login-form').addEventListener('submit', function (e) {
             e.preventDefault();
             var value = $('token-input').value.trim();
@@ -688,7 +835,7 @@
         window.addEventListener('hashchange', route);
 
         var saved = storedToken();
-        if (saved) start(saved, false, false);
+        if (saved) start(saved, false, false, 'password-error');
         else $('login-view').hidden = false;
     });
 })();
