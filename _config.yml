@@ -1,0 +1,13 @@
+# إعداد GitHub Pages: يُنشر فقط index.html و404.html (تحويل إلى الموقع الفعلي على Vercel)،
+# ولا تُنشر ملفات PHP أو SQL أو غيرها لأن GitHub Pages لا يشغّلها بل يعرضها كنصوص.
+exclude:
+  - "*.php"
+  - "*.sql"
+  - "*.txt"
+  - "*.json"
+  - admin
+  - api
+  - includes
+  - css
+  - js
+  - images
