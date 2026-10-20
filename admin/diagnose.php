@@ -67,7 +67,7 @@ foreach ($checks as $c) { if (!$c['ok']) { $allOk = false; break; } }
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>تشخيص تسجيل دخول الأدمن</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=<?= @filemtime(__DIR__ . '/../css/style.css') ?: 1 ?>">
 </head>
 <body>
 <nav class="navbar"><div class="container"><h1>🛠️ تشخيص تسجيل الدخول</h1></div></nav>

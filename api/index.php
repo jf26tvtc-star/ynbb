@@ -11,7 +11,7 @@ require_once YANBU_ROOT . '/includes/session.php';
 function yanbu_not_found() {
     http_response_code(404);
     header('Content-Type: text/html; charset=UTF-8');
-    echo '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الصفحة غير موجودة</title><link rel="stylesheet" href="/css/style.css"></head>'
+    echo '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الصفحة غير موجودة</title><link rel="stylesheet" href="/css/style.css?v=' . (@filemtime(YANBU_ROOT . '/css/style.css') ?: 1) . '"></head>'
         . '<body><section class="container" style="text-align:center;margin:90px auto;"><h2>الصفحة غير موجودة</h2><p style="margin:12px 0 24px;color:var(--muted);">ربما تم نقل الصفحة أو أن الرابط غير صحيح.</p><a class="btn" href="/index.php">العودة للرئيسية</a></section></body></html>';
     exit();
 }
@@ -60,7 +60,7 @@ function yanbu_handle_exception($e) {
     $message = $needsSetup
         ? 'قاعدة البيانات متصلة لكنها لم تُهيّأ بعد. إذا كنت مدير الموقع افتح صفحة <a href="/setup.php">التهيئة</a>.'
         : 'حدث خطأ غير متوقع. حاول مرة أخرى بعد قليل.';
-    echo '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>خطأ - روح ينبع</title><link rel="stylesheet" href="/css/style.css"></head>'
+    echo '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>خطأ - روح ينبع</title><link rel="stylesheet" href="/css/style.css?v=' . (@filemtime(YANBU_ROOT . '/css/style.css') ?: 1) . '"></head>'
         . '<body><section class="container" style="text-align:center;margin:90px auto;"><h2>' . ($needsSetup ? 'الموقع يحتاج تهيئة' : 'عذرًا') . '</h2><p style="margin-top:12px;color:var(--muted);">' . $message . '</p></section></body></html>';
 }
 set_exception_handler('yanbu_handle_exception');

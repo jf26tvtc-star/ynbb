@@ -12,7 +12,7 @@ $cats = $conn->query("SELECT c.*, (SELECT COUNT(*) FROM places p WHERE p.categor
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>التصنيفات السياحية - روح ينبع</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?: 1 ?>">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Markazi+Text:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
