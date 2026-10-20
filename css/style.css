@@ -19,11 +19,11 @@
     --danger: #c2493f;
     --warning: #d99a2b;
 
-    /* ألوان التصنيفات الأربعة */
-    --sea: #0f7fa3;      --sea-bg: #e7f4f8;
-    --history: #a9712f;  --history-bg: #f8efe1;
-    --nature: #2f8a4e;   --nature-bg: #e9f6ec;
-    --fun: #a6447a;      --fun-bg: #f8e9f1;
+    /* ألوان التصنيفات الأربعة: درجات مختلفة من نفس الطابع البحري لتبقى مميزة عن بعضها */
+    --sea: #1f7fc4;      --sea-bg: #e6f2fc;
+    --history: #173a66;  --history-bg: #e8edf6;
+    --nature: #0f7d86;   --nature-bg: #e3f4f5;
+    --fun: #4b55b8;      --fun-bg: #ebedfa;
     --general: #62738a;  --general-bg: #eef2f7;
 
     --dark: var(--ink);
@@ -391,7 +391,7 @@ section.container > h2 {
     margin-bottom: 20px;
 }
 .place-details h3 { color: var(--primary-dark); margin-bottom: 10px; font-size: 18px; }
-.rating { color: var(--warning); font-size: 20px; letter-spacing: 2px; }
+.rating { color: var(--primary-light); font-size: 20px; letter-spacing: 2px; }
 
 .map-embed { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); margin-top: 12px; }
 .map-embed iframe { width: 100%; height: 320px; border: 0; display: block; }

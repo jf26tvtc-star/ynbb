@@ -99,7 +99,7 @@
 .dash-hero-link:hover { color: #fff; }
 .dash-hero-link .dash-icon { width: 17px; }
 .dash-coast-art { position: relative; width: 30%; min-width: 180px; overflow: hidden; background: radial-gradient(ellipse at 30% 100%, #8fd0f530, transparent 70%); }
-.dash-sun { position: absolute; width: 64px; height: 64px; background: #f3d98f; border-radius: 50%; top: 38px; left: 65px; box-shadow: 0 0 70px #f3d98f40; }
+.dash-sun { position: absolute; width: 64px; height: 64px; background: #cfeafb; border-radius: 50%; top: 38px; left: 65px; box-shadow: 0 0 70px #8fd0f560; }
 .dash-orbit { position: absolute; width: 340px; height: 340px; border: 1px solid #cfe7f72e; border-radius: 45%; transform: rotate(-30deg); }
 .orbit-one { top: 110px; left: -100px; background: #8fd0f51a; }
 .orbit-two { top: 150px; left: -20px; background: #8fd0f514; }
