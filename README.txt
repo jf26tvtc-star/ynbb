@@ -21,7 +21,17 @@
   لأن ملفات Vercel مؤقتة. محليًا على XAMPP يبقى كل شيء كما هو (ملفات الجلسات ومجلد images).
 - حجم الطلب على Vercel محدود بحوالي 4.5MB، فارفع صورًا مجموعها أقل من 4MB في المرة الواحدة.
 
-خطوات التشغيل:
+الطريقة الأسهل (ربط TiDB Cloud من Vercel بضغطات):
+1) في Vercel افتح المشروع > Storage (أو https://vercel.com/marketplace/tidb-cloud) واختر TiDB Cloud > Install.
+   سجّل/أنشئ حساب TiDB، واختر Cluster ثم Create Cluster (الخطة المجانية Starter)، واختر الإطار General،
+   واربطه بمشروع ynbb. اترك خيار Branching مطفأً حتى تستخدم كل النسخ نفس قاعدة البيانات.
+   سيضيف التكامل تلقائيًا: TIDB_HOST, TIDB_PORT, TIDB_USER, TIDB_PASSWORD, TIDB_DATABASE — والموقع يقرأها مباشرة.
+2) في Vercel: Settings > Environment Variables أضف ADMIN_PASSWORD بكلمة مرور قوية (8 أحرف على الأقل).
+3) Deployments > Redeploy. عند أول زيارة يُنشئ الموقع تلقائيًا الجداول والتصنيفات ووجهة مهرجان الزهور
+   وحساب المدير admin بكلمة المرور السابقة (لا يحذف أي بيانات، ولا يغيّر كلمة مرور مدير موجود).
+4) ادخل من /admin/ باسم admin. بعد التأكد يمكنك حذف ADMIN_PASSWORD من Vercel (لم يعد يُستخدم).
+
+طريقة يدوية (بديلة لأي قاعدة MySQL أخرى):
 1) أنشئ قاعدة MySQL خارجية مجانية (مثل TiDB Cloud Serverless: https://tidbcloud.com)، ثم من Connect
    انسخ: Host و Port و User و Password، وأنشئ قاعدة باسم yanbu_tourism (أو استخدم الاسم الموجود).
 2) في Vercel: Project > Settings > Environment Variables أضف:

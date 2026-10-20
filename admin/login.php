@@ -48,6 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <form method="POST" class="login-form">
         <h2>🔐 دخول الأدمن</h2>
 
+        <?php if (defined('YANBU_NO_ADMIN')) { ?>
+            <div class="alert alert-danger">لم يُنشأ حساب المدير بعد. أضف متغير البيئة ADMIN_PASSWORD (8 أحرف على الأقل) في إعدادات الاستضافة ثم أعد النشر.</div>
+        <?php } ?>
+
         <?php if($error) { ?>
             <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
         <?php } ?>

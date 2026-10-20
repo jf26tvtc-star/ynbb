@@ -7,6 +7,7 @@ define('YANBU_ROOT', dirname(__DIR__));
 
 require_once YANBU_ROOT . '/includes/database.php';
 require_once YANBU_ROOT . '/includes/session.php';
+require_once YANBU_ROOT . '/includes/install.php';
 
 function yanbu_not_found() {
     http_response_code(404);
@@ -96,8 +97,11 @@ if (!is_file($yanbuFile)) {
 
 try {
     yanbu_db();
+    if (!yanbu_ensure_installed(yanbu_db())) {
+        define('YANBU_NO_ADMIN', true);
+    }
 } catch (mysqli_sql_exception $e) {
-    error_log('Database connection failed: ' . $e->getMessage());
+    error_log('Database connection or setup failed: ' . $e->getMessage());
     if ($yanbuPath !== '/setup.php') {
         yanbu_render_unavailable();
     }

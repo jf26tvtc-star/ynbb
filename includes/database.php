@@ -1,6 +1,8 @@
 <?php
 // إعداد الاتصال بقاعدة البيانات من متغيرات البيئة (Vercel) مع قيم افتراضية تناسب XAMPP محليًا.
-// المتغيرات المدعومة: DATABASE_URL أو (DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_SSL, DB_SSL_CA)
+// المتغيرات المدعومة (بالأولوية): DATABASE_URL، ثم DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME،
+// ثم المتغيرات التي يضيفها تكامل TiDB Cloud في Vercel تلقائيًا: TIDB_HOST/TIDB_PORT/TIDB_USER/TIDB_PASSWORD/TIDB_DATABASE.
+// خيارات إضافية: DB_SSL (true/false) و DB_SSL_CA (مسار شهادة الجذر).
 
 function yanbu_env($key, $default = null) {
     $value = getenv($key);
@@ -16,11 +18,11 @@ function yanbu_is_serverless() {
 
 function yanbu_db_config() {
     $config = [
-        'host' => yanbu_env('DB_HOST', 'localhost'),
-        'port' => (int)yanbu_env('DB_PORT', 3306),
-        'user' => yanbu_env('DB_USER', 'root'),
-        'pass' => yanbu_env('DB_PASSWORD', ''),
-        'name' => yanbu_env('DB_NAME', 'yanbu_tourism'),
+        'host' => yanbu_env('DB_HOST', yanbu_env('TIDB_HOST', 'localhost')),
+        'port' => (int)yanbu_env('DB_PORT', yanbu_env('TIDB_PORT', 3306)),
+        'user' => yanbu_env('DB_USER', yanbu_env('TIDB_USER', 'root')),
+        'pass' => yanbu_env('DB_PASSWORD', yanbu_env('TIDB_PASSWORD', '')),
+        'name' => yanbu_env('DB_NAME', yanbu_env('TIDB_DATABASE', 'yanbu_tourism')),
     ];
 
     $url = yanbu_env('DATABASE_URL');

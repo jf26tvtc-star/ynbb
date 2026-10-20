@@ -73,7 +73,8 @@ function yanbu_install(mysqli $conn, $adminPassword) {
     ];
     $catCount = (int)$conn->query('SELECT COUNT(*) FROM categories')->fetch_row()[0];
     if ($catCount === 0) {
-        $stmt = $conn->prepare('INSERT INTO categories (name, description) VALUES (?, ?)');
+        // IGNORE: إذا شغّل طلبان التهيئة في نفس اللحظة لا يفشل أحدهما بسبب تكرار الاسم
+        $stmt = $conn->prepare('INSERT IGNORE INTO categories (name, description) VALUES (?, ?)');
         foreach ($categories as [$catName, $catDesc]) {
             $stmt->bind_param('ss', $catName, $catDesc);
             $stmt->execute();
@@ -82,19 +83,20 @@ function yanbu_install(mysqli $conn, $adminPassword) {
     }
 
     $adminExists = (bool)$conn->query("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1")->fetch_row();
-    if (!$adminExists) {
+    if ($adminExists) {
+        $log[] = 'حساب المدير موجود مسبقًا ولم يتم تغييره';
+    } elseif (is_string($adminPassword) && strlen($adminPassword) >= 8) {
         $hash = password_hash($adminPassword, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES ('admin', ?, 'admin')");
+        $stmt = $conn->prepare("INSERT IGNORE INTO users (username, password, role) VALUES ('admin', ?, 'admin')");
         $stmt->bind_param('s', $hash);
         $stmt->execute();
         $log[] = 'أُنشئ حساب المدير admin بكلمة المرور التي اخترتها';
     } else {
-        $log[] = 'حساب المدير موجود مسبقًا ولم يتم تغييره';
+        $log[] = 'لم يُنشأ حساب المدير لأن كلمة المرور غير محددة أو أقصر من 8 أحرف';
     }
 
-    $placeCount = (int)$conn->query('SELECT COUNT(*) FROM places')->fetch_row()[0];
     $natureId = $conn->query("SELECT id FROM categories WHERE name = 'جبال' LIMIT 1")->fetch_row();
-    if ($placeCount === 0 && $natureId) {
+    if ($natureId) {
         $name = 'مهرجان الزهور والحدائق بينبع';
         $location = 'ينبع الصناعية - حديقة المناسبات';
         $maps = 'https://www.google.com/maps/search/?api=1&query=' . urlencode('Yanbu Flowers and Gardens Festival Park, Yanbu Industrial City');
@@ -104,16 +106,41 @@ function yanbu_install(mysqli $conn, $adminPassword) {
             . "مصدر الصورة: Ahmed Abdulbasit عبر ويكيميديا كومنز (رخصة CC BY-SA 4.0).";
         $categoryId = (int)$natureId[0];
         $phone = '';
-        $stmt = $conn->prepare('INSERT INTO places (name, description, category_id, location, google_maps_url, phone) VALUES (?, ?, ?, ?, ?, ?)');
+        // تُضاف الوجهة الافتتاحية فقط إذا كان الدليل فارغًا تمامًا
+        $stmt = $conn->prepare('INSERT INTO places (name, description, category_id, location, google_maps_url, phone)
+            SELECT ?, ?, ?, ?, ?, ? FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM places)');
         $stmt->bind_param('ssisss', $name, $description, $categoryId, $location, $maps, $phone);
         $stmt->execute();
-        $placeId = $stmt->insert_id;
-        $image = 'place_6ad7128249b062.66658225.jpg';
-        $img = $conn->prepare('INSERT INTO images (place_id, image_path, is_main) VALUES (?, ?, 1)');
-        $img->bind_param('is', $placeId, $image);
-        $img->execute();
-        $log[] = 'أُضيفت وجهة مهرجان الزهور والحدائق بينبع مع صورتها';
+        if ($stmt->affected_rows > 0) {
+            $placeId = $stmt->insert_id;
+            $image = 'place_6ad7128249b062.66658225.jpg';
+            $img = $conn->prepare('INSERT INTO images (place_id, image_path, is_main) VALUES (?, ?, 1)');
+            $img->bind_param('is', $placeId, $image);
+            $img->execute();
+            $log[] = 'أُضيفت وجهة مهرجان الزهور والحدائق بينبع مع صورتها';
+        }
     }
 
     return $log;
+}
+
+// تهيئة تلقائية عند أول زيارة على الاستضافة: تُنشئ الجداول إن لم توجد، وتُنشئ حساب المدير
+// من متغير البيئة ADMIN_PASSWORD إن لم يوجد مدير بعد. تكلفتها استعلام صغير واحد لكل طلب.
+// تُرجع true إذا كان هناك حساب مدير جاهز.
+function yanbu_ensure_installed(mysqli $conn) {
+    try {
+        if ($conn->query("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1")->fetch_row()) {
+            return true;
+        }
+        $needsInstall = (bool)yanbu_env('ADMIN_PASSWORD');
+    } catch (mysqli_sql_exception $e) {
+        if ((int)$e->getCode() !== 1146) throw $e;
+        $needsInstall = true;
+    }
+    if (!$needsInstall) {
+        return false;
+    }
+    $log = yanbu_install($conn, yanbu_env('ADMIN_PASSWORD'));
+    error_log('Automatic setup: ' . implode(' | ', $log));
+    return (bool)$conn->query("SELECT 1 FROM users WHERE role = 'admin' LIMIT 1")->fetch_row();
 }
