@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا - روح ينبع</title>
+    <link rel="stylesheet" href="css/style.css?v=33c27f8d">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Markazi+Text:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body data-page="contact">
+    <nav class="navbar site-navbar" aria-label="التنقل الرئيسي">
+        <div class="container">
+            <h1>🌴 روح ينبع</h1>
+            <ul>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="destination.html?area=sea">ينبع البحر</a></li>
+                <li><a href="destination.html?area=nakhl">ينبع النخل</a></li>
+                <li><a href="destination.html?area=industrial">ينبع الصناعية</a></li>
+                <li><a href="places.html">اكتشف الأماكن</a></li>
+                <li><a href="trip.html">خطط رحلتك</a></li>
+                <li><a href="about.html">من نحن</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h2>تواصل معنا</h2>
+            <p>نحن هنا للإجابة على جميع استفسارتك</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="contact-layout">
+            <div>
+                <h2 style="color: var(--deep); margin-bottom: 30px;">معلومات التواصل</h2>
+                <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--deep); margin-bottom: 10px;">📍 العنوان</h3>
+                    <p>ينبع، المملكة العربية السعودية</p>
+                </div>
+                <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--deep); margin-bottom: 10px;">📱 الهاتف</h3>
+                    <p dir="ltr" style="text-align:right;"><a href="tel:+96656789455" style="color:inherit;text-decoration:none;">+96656789455</a></p>
+                </div>
+                <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    <h3 style="color: var(--deep); margin-bottom: 10px;">📧 البريد الإلكتروني</h3>
+                    <p><a href="mailto:jf26tvtc@gmail.com" style="color:inherit;text-decoration:none;">jf26tvtc@gmail.com</a></p>
+                </div>
+            </div>
+
+            <div>
+                <!-- تُرسل الرسائل إلى البريد عبر خدمة FormSubmit (لا يحتاج الموقع الثابت إلى خادم) -->
+                <form class="contact-form" id="contact-form" action="https://formsubmit.co/jf26tvtc@gmail.com" method="POST">
+                    <div id="contact-status" role="status" aria-live="polite" hidden></div>
+                    <input type="hidden" name="_subject" value="رسالة جديدة من موقع روح ينبع">
+                    <input type="hidden" name="_template" value="table">
+                    <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
+                    <input type="text" name="name" placeholder="اسمك الكامل" aria-label="اسمك الكامل" required>
+                    <input type="email" name="email" placeholder="بريدك الإلكتروني" aria-label="بريدك الإلكتروني" required>
+                    <input type="tel" name="phone" placeholder="رقم الهاتف" aria-label="رقم الهاتف">
+                    <input type="text" name="subject" placeholder="الموضوع" aria-label="الموضوع">
+                    <textarea name="message" placeholder="رسالتك..." rows="6" aria-label="رسالتك" required></textarea>
+                    <button type="submit" class="btn">إرسال الرسالة 📤</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 روح ينبع | جميع الحقوق محفوظة</p>
+            <p>📧 jf26tvtc@gmail.com | 📱 +96656789455</p>
+        </div>
+    </footer>
+    <script src="js/site.js?v=5a58bc2c"></script>
+</body>
+</html>

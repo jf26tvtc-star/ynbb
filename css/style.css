@@ -426,8 +426,13 @@ footer {
 }
 footer p { margin: 4px 0; }
 
+/* ==================== STATIC SITE (GitHub Pages) ==================== */
+.empty-note { text-align: center; color: var(--muted); padding: 40px; }
+.contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 40px 0; }
+
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
+  .contact-layout { grid-template-columns: 1fr; gap: 24px; }
   .navbar .container { flex-direction: column; gap: 12px; }
   .navbar ul { flex-wrap: wrap; justify-content: center; gap: 6px; }
   .navbar h1 { font-size: 20px; }

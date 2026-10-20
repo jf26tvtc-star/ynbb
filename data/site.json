@@ -1,0 +1,71 @@
+{
+    "generated_at": "2026-10-20T11:41:45+02:00",
+    "hero_image": "place_6ad7128249b062.66658225.jpg",
+    "stats": {
+        "places": 1,
+        "categories": 4,
+        "images": 1
+    },
+    "categories": [
+        {
+            "id": 1,
+            "name": "شواطئ",
+            "description": "الشواطئ والواجهات البحرية",
+            "type": "بحرية",
+            "slug": "sea",
+            "icon": "🏖️",
+            "places_count": 0,
+            "cover": ""
+        },
+        {
+            "id": 2,
+            "name": "جبال",
+            "description": "الجبال والطبيعة",
+            "type": "طبيعية",
+            "slug": "nature",
+            "icon": "🏔️",
+            "places_count": 1,
+            "cover": "place_6ad7128249b062.66658225.jpg"
+        },
+        {
+            "id": 3,
+            "name": "معالم",
+            "description": "المعالم التاريخية والثقافية",
+            "type": "تاريخية",
+            "slug": "history",
+            "icon": "🏛️",
+            "places_count": 0,
+            "cover": ""
+        },
+        {
+            "id": 4,
+            "name": "مطاعم",
+            "description": "المطاعم والفنادق",
+            "type": "ترفيهية",
+            "slug": "fun",
+            "icon": "🎡",
+            "places_count": 0,
+            "cover": ""
+        }
+    ],
+    "places": [
+        {
+            "id": 3,
+            "name": "مهرجان الزهور والحدائق بينبع",
+            "description": "مهرجان سنوي تنظمه الهيئة الملكية بينبع في حديقة المناسبات بمدينة ينبع الصناعية مع بداية فصل الربيع، ويُعد من أشهر فعاليات ينبع وأجملها. تتحول فيه الحديقة إلى لوحات ملونة من ملايين الزهور الموزعة على مساحات واسعة.\n\nاشتهر المهرجان بسجادة الزهور التي دخلت موسوعة غينيس كأكبر سجادة زهور في العالم عام 2014، ثم استعادت اللقب عام 2017 بمساحة تتجاوز 16 ألف متر مربع.\n\nيضم المهرجان ممرات للمشي ومناطق مخصصة للعائلات والأطفال وفعاليات ترفيهية وثقافية، ويُنصح بزيارته في فترة المساء حين تتزين الحديقة بالإضاءة ويعتدل الجو.\n\nمصدر الصورة: Ahmed Abdulbasit عبر ويكيميديا كومنز (رخصة CC BY-SA 4.0).",
+            "category_id": 2,
+            "category": "جبال",
+            "type": "طبيعية",
+            "slug": "nature",
+            "icon": "🏔️",
+            "location": "ينبع الصناعية - حديقة المناسبات",
+            "phone": "",
+            "maps_embed": "https://www.google.com/maps?q=%D9%85%D9%87%D8%B1%D8%AC%D8%A7%D9%86+%D8%A7%D9%84%D8%B2%D9%87%D9%88%D8%B1+%D9%88%D8%A7%D9%84%D8%AD%D8%AF%D8%A7%D8%A6%D9%82+%D8%A8%D9%8A%D9%86%D8%A8%D8%B9+%D9%8A%D9%86%D8%A8%D8%B9+%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%D8%A9+-+%D8%AD%D8%AF%D9%8A%D9%82%D8%A9+%D8%A7%D9%84%D9%85%D9%86%D8%A7%D8%B3%D8%A8%D8%A7%D8%AA+%D9%8A%D9%86%D8%A8%D8%B9&output=embed",
+            "maps_url": "https://www.google.com/maps/search/?api=1&query=Yanbu+Flowers+and+Gardens+Festival+Park%2C+Yanbu+Industrial+City",
+            "created_at": "2026-10-20",
+            "images": [
+                "place_6ad7128249b062.66658225.jpg"
+            ]
+        }
+    ]
+}

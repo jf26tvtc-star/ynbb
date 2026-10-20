@@ -17,7 +17,7 @@ $error = '';
 $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 
 if (upload_too_large()) {
-    $error = 'حجم الصور المرفوعة أكبر من المسموح. ارفع صورًا أصغر (المجموع أقل من 4MB في المرة الواحدة).';
+    $error = 'حجم الصور المرفوعة أكبر من المسموح في إعدادات الخادم. ارفع صورًا أصغر أو عددًا أقل في المرة الواحدة.';
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $category_id = (int)($_POST['category_id'] ?? 0);
@@ -115,7 +115,7 @@ $images = $imgRes->get_result();
 <input type="url" name="google_maps_url" placeholder="رابط خرائط قوقل (اختياري)" value="<?=htmlspecialchars($place['google_maps_url'] ?? '')?>">
 <input type="text" name="phone" placeholder="رقم الهاتف (اختياري)" value="<?=htmlspecialchars($place['phone'] ?? '')?>">
 <textarea name="description" rows="7" required><?=htmlspecialchars($place['description'])?></textarea>
-<label style="display:block;margin:10px 0 6px;color:#555;">إضافة صور جديدة (اختياري، يمكن اختيار أكثر من صورة، ويُفضّل ألا يتجاوز مجموعها 4MB في المرة الواحدة)</label>
+<label style="display:block;margin:10px 0 6px;color:#555;">إضافة صور جديدة (اختياري، يمكن اختيار أكثر من صورة)</label>
 <input type="file" name="images[]" accept="image/jpeg,image/png,image/webp" multiple>
 <button class="btn">حفظ التعديلات</button>
 </form>

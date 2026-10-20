@@ -78,6 +78,7 @@ function dashboard_icon($name) {
                     <a href="places-list.php">إدارة الأماكن <span class="dash-nav-count"><?= $places_count ?></span></a>
                     <a href="add_place.php">إضافة مكان جديد</a>
                     <a href="categories.php">التصنيفات <span class="dash-nav-count"><?= $categories_count ?></span></a>
+                    <a href="publish.php">نشر الموقع</a>
                 </div>
             </details>
             <details class="dash-menu-group" open>
@@ -95,9 +96,9 @@ function dashboard_icon($name) {
             </details>
         </nav>
         <div class="dash-sidebar-note">
-            <strong>وجهات تستحق الاكتشاف</strong>
-            <p>أضف مكانًا جديدًا، وساعد زوار ينبع على صنع رحلة أجمل.</p>
-            <a href="add_place.php">إضافة وجهة</a>
+            <strong>انشر تحديثاتك</strong>
+            <p>بعد إضافة أو تعديل الأماكن، انشرها لتظهر للزوار على GitHub Pages.</p>
+            <a href="publish.php">نشر الموقع</a>
         </div>
     </aside>
 
@@ -144,6 +145,7 @@ function dashboard_icon($name) {
                 <a href="places-list.php"><?= dashboard_icon('pin') ?> إدارة الأماكن</a>
                 <a href="categories.php"><?= dashboard_icon('tag') ?> إدارة التصنيفات</a>
                 <a href="messages.php"><?= dashboard_icon('mail') ?> متابعة الرسائل</a>
+                <a href="publish.php"><?= dashboard_icon('globe') ?> نشر الموقع</a>
             </section>
 
             <div class="dash-content-grid">

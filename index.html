@@ -1,20 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>روح ينبع - جارٍ التحويل</title>
-    <!-- GitHub Pages لا يشغّل PHP؛ هذه الصفحة تحوّل الزائر إلى الموقع الفعلي على Vercel -->
-    <meta http-equiv="refresh" content="0; url=https://ynbb.vercel.app/">
-    <link rel="canonical" href="https://ynbb.vercel.app/">
-    <meta name="robots" content="noindex">
-    <script>location.replace('https://ynbb.vercel.app/' + location.search + location.hash);</script>
-    <style>body{font-family:Tahoma,sans-serif;background:#f3f6fa;color:#0f2340;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center}a{color:#1f5fa8;font-weight:700}</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>روح ينبع - اكتشف جمال ينبع</title>
+    <meta name="description" content="روح ينبع: دليل سياحي لشواطئ ينبع ومعالمها وطبيعتها ومطاعمها في مكان واحد.">
+    <link rel="stylesheet" href="css/style.css?v=33c27f8d">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Markazi+Text:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <main>
-        <h1>روح ينبع</h1>
-        <p>جارٍ تحويلك إلى الموقع... إذا لم يتم التحويل تلقائيًا <a href="https://ynbb.vercel.app/">اضغط هنا</a>.</p>
-    </main>
+<body data-page="home">
+    <nav class="navbar site-navbar" aria-label="التنقل الرئيسي">
+        <div class="container">
+            <h1>🌴 روح ينبع</h1>
+            <ul>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="destination.html?area=sea">ينبع البحر</a></li>
+                <li><a href="destination.html?area=nakhl">ينبع النخل</a></li>
+                <li><a href="destination.html?area=industrial">ينبع الصناعية</a></li>
+                <li><a href="places.html">اكتشف الأماكن</a></li>
+                <li><a href="trip.html">خطط رحلتك</a></li>
+                <li><a href="about.html">من نحن</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero" id="home-hero">
+        <div class="container">
+            <span class="eyebrow">المملكة العربية السعودية</span>
+            <h2>اكتشف جمال ينبع</h2>
+            <p>شواطئ ساحرة، تاريخ عريق، طبيعة خلّابة، ومطاعم تستحق الزيارة — كل وجهات ينبع في مكان واحد</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <form class="hero-search" action="places.html" method="get">
+            <input type="text" name="search" placeholder="🔍 ابحث عن مكان، شاطئ، مطعم..." aria-label="ابحث عن مكان">
+            <select name="category" id="home-category" aria-label="التصنيف">
+                <option value="">كل التصنيفات</option>
+            </select>
+            <button type="submit" class="btn">ابحث</button>
+        </form>
+        <div class="cat-pills" id="home-pills"></div>
+    </div>
+
+    <div id="home-sections">
+        <section class="container"><p class="empty-note">جارٍ تحميل الوجهات...</p></section>
+    </div>
+
+    <section class="container">
+        <div class="dashboard-grid">
+            <div class="stat-card"><h3>وجهات سياحية</h3><div class="number" id="stat-places">—</div></div>
+            <div class="stat-card"><h3>تصنيفات</h3><div class="number" id="stat-categories">—</div></div>
+            <div class="stat-card"><h3>صور</h3><div class="number" id="stat-images">—</div></div>
+            <div class="stat-card"><h3>تقييم الزوار</h3><div class="number">4.5 ⭐</div></div>
+        </div>
+    </section>
+
+    <section class="container" style="text-align:center;background:var(--card);padding:50px 30px;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);">
+        <h2 style="margin-bottom:10px;">خطّط لرحلتك القادمة إلى ينبع</h2>
+        <p class="section-sub" style="margin-bottom:22px;">تصفّح دليل الوجهات الكامل أو تواصل معنا لأي استفسار</p>
+        <a href="places.html" class="btn">تصفّح كل الأماكن</a>
+        <a href="contact.html" class="btn btn-secondary" style="margin-right:10px;">تواصل معنا</a>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 روح ينبع | جميع الحقوق محفوظة</p>
+            <p>📧 jf26tvtc@gmail.com | 📱 +96656789455</p>
+        </div>
+    </footer>
+    <script src="js/site.js?v=5a58bc2c"></script>
 </body>
 </html>

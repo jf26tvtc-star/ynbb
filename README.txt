@@ -12,36 +12,23 @@
 2) شغّل Apache و MySQL (يفضّل PHP 8.1 فأعلى).
 3) من phpMyAdmin استورد database.sql (ملاحظة: هذا يعيد إنشاء جداول المشروع).
 4) افتح http://localhost/yanbu-tourism/
-5) دخول الأدمن: admin / admin123
+5) دخول الأدمن: admin / admin123 (لوحة التحكم محلية على XAMPP: http://localhost/yanbu-tourism/admin/)
 
-النشر على Vercel (الموقع مبني بـ PHP + MySQL، وVercel لا يشغّلهما افتراضيًا):
-- vercel.json يشغّل PHP عبر vercel-php، وكل الطلبات تمر على api/index.php الذي يشغّل الصفحة المطلوبة
-  ويمنع الوصول لملفات الكود والـ SQL ومجلد includes وأداة admin/diagnose.php.
-- على Vercel تُحفظ جلسات تسجيل الدخول والصور المرفوعة داخل قاعدة البيانات (جدولا sessions و image_files)
-  لأن ملفات Vercel مؤقتة. محليًا على XAMPP يبقى كل شيء كما هو (ملفات الجلسات ومجلد images).
-- حجم الطلب على Vercel محدود بحوالي 4.5MB، فارفع صورًا مجموعها أقل من 4MB في المرة الواحدة.
+النشر على GitHub Pages (https://jf26tvtc-star.github.io/ynbb/):
+- GitHub Pages يعرض ملفات ثابتة فقط ولا يشغّل PHP أو MySQL، لذلك للموقع نسختان:
+  1) الموقع العام الثابت: index.html, places.html, details.html, categories.html, destination.html,
+     trip.html, about.html, contact.html + js/site.js، ويقرأ المحتوى من data/site.json.
+  2) لوحة التحكم (admin/) وصفحات PHP: تعمل محليًا على XAMPP فقط، ولا تُنشر (انظر _config.yml).
+- نموذج التواصل في contact.html يرسل الرسائل إلى jf26tvtc@gmail.com عبر خدمة FormSubmit المجانية.
+  أول رسالة تصل يرسل FormSubmit بريد تفعيل إلى هذا العنوان؛ اضغط Activate فيه مرة واحدة لتبدأ الرسائل بالوصول.
+- المعاينة محليًا: http://localhost/yanbu-tourism/index.html
 
-الطريقة الأسهل (ربط TiDB Cloud من Vercel بضغطات):
-1) في Vercel افتح المشروع > Storage (أو https://vercel.com/marketplace/tidb-cloud) واختر TiDB Cloud > Install.
-   سجّل/أنشئ حساب TiDB، واختر Cluster ثم Create Cluster (الخطة المجانية Starter)، واختر الإطار General،
-   واربطه بمشروع ynbb. اترك خيار Branching مطفأً حتى تستخدم كل النسخ نفس قاعدة البيانات.
-   سيضيف التكامل تلقائيًا: TIDB_HOST, TIDB_PORT, TIDB_USER, TIDB_PASSWORD, TIDB_DATABASE — والموقع يقرأها مباشرة.
-2) في Vercel: Settings > Environment Variables أضف ADMIN_PASSWORD بكلمة مرور قوية (8 أحرف على الأقل).
-3) Deployments > Redeploy. عند أول زيارة يُنشئ الموقع تلقائيًا الجداول والتصنيفات ووجهة مهرجان الزهور
-   وحساب المدير admin بكلمة المرور السابقة (لا يحذف أي بيانات، ولا يغيّر كلمة مرور مدير موجود).
-4) ادخل من /admin/ باسم admin. بعد التأكد يمكنك حذف ADMIN_PASSWORD من Vercel (لم يعد يُستخدم).
-
-طريقة يدوية (بديلة لأي قاعدة MySQL أخرى):
-1) أنشئ قاعدة MySQL خارجية مجانية (مثل TiDB Cloud Serverless: https://tidbcloud.com)، ثم من Connect
-   انسخ: Host و Port و User و Password، وأنشئ قاعدة باسم yanbu_tourism (أو استخدم الاسم الموجود).
-2) في Vercel: Project > Settings > Environment Variables أضف:
-   DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
-   (أو DATABASE_URL بصيغة mysql://user:pass@host:port/dbname). يُفعَّل TLS تلقائيًا لأي خادم غير محلي؛
-   لخادم يحتاج شهادة خاصة أضف DB_SSL_CA بمسار الشهادة، أو DB_SSL=false لتعطيله.
-   وأضف مؤقتًا SETUP_TOKEN برمز سري طويل (12 حرفًا على الأقل).
-3) أعد النشر (Deployments > Redeploy)، ثم افتح https://<موقعك>/setup.php وأدخل SETUP_TOKEN
-   وكلمة مرور جديدة للمدير. تنشئ الصفحة الجداول والتصنيفات وحساب admin ووجهة مهرجان الزهور، ولا تحذف أي بيانات.
-4) احذف SETUP_TOKEN من متغيرات Vercel وأعد النشر لتعطيل صفحة التهيئة، ثم سجّل الدخول من /admin/.
+نشر أي تعديل (بعد إضافة/تعديل الأماكن أو الصور من لوحة التحكم):
+- من لوحة التحكم: "نشر الموقع" > "نشر الآن" (يصدّر البيانات ويرفعها إلى GitHub)، أو
+- انقر نقرًا مزدوجًا على publish.bat في مجلد المشروع (يحتاج تشغيل MySQL في XAMPP).
+- يظهر التحديث على الموقع خلال دقيقة إلى دقيقتين.
+- تصدير البيانات فقط بدون رفع: C:\xampp\php\php.exe tools\export.php
+- يُفضّل أن تكون الصور المرفوعة صغيرة الحجم (أقل من 1MB تقريبًا) لأنها تُرفع ضمن مستودع GitHub.
 
 إذا عندك النسخة القديمة ذات 3 جداول وتريد الاحتفاظ ببياناتها:
 - خذ Export احتياطي أولاً.

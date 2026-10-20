@@ -8,7 +8,7 @@ $error = '';
 $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 
 if (upload_too_large()) {
-    $error = 'حجم الصور المرفوعة أكبر من المسموح. ارفع صورًا أصغر (المجموع أقل من 4MB في المرة الواحدة).';
+    $error = 'حجم الصور المرفوعة أكبر من المسموح في إعدادات الخادم. ارفع صورًا أصغر أو عددًا أقل في المرة الواحدة.';
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $category_id = (int)($_POST['category_id'] ?? 0);
@@ -114,7 +114,7 @@ if (upload_too_large()) {
 
                 <textarea name="description" placeholder="وصف المكان" rows="6" required style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 6px; font-family: inherit;"><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
 
-                <label style="display:block;margin-bottom:6px;color:#555;">صور المكان (يمكن اختيار أكثر من صورة — أول صورة تصبح الصورة الرئيسية، ويُفضّل ألا يتجاوز مجموعها 4MB في المرة الواحدة)</label>
+                <label style="display:block;margin-bottom:6px;color:#555;">صور المكان (يمكن اختيار أكثر من صورة — أول صورة تصبح الصورة الرئيسية)</label>
                 <input type="file" name="images[]" accept="image/*" multiple style="width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 6px;">
 
                 <button type="submit" class="btn" style="width: 100%; padding: 12px;">إضافة المكان ✓</button>

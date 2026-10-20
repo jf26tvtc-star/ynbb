@@ -1,12 +1,12 @@
 <?php
-// الاتصال: يقرأ الإعدادات من متغيرات البيئة على Vercel، ويستخدم إعدادات XAMPP الافتراضية محليًا
+// الاتصال بقاعدة البيانات المحلية (XAMPP). يمكن تغيير الإعدادات عبر متغيرات البيئة (انظر includes/database.php)
 require_once __DIR__ . '/includes/database.php';
 
 try {
     $conn = yanbu_db();
 } catch (mysqli_sql_exception $e) {
     error_log('Database connection failed: ' . $e->getMessage());
-    yanbu_render_unavailable(yanbu_is_serverless() ? '' : $e->getMessage());
+    yanbu_render_unavailable($e->getMessage());
 }
 
 // دالة لتنظيف المدخلات (trim فقط — الحماية من SQL تتم عبر prepared statements،
@@ -67,15 +67,8 @@ function place_image($path) {
     return $path !== '' ? $path : 'placeholder.svg';
 }
 
-// حفظ صورة مرفوعة: في مجلد images محليًا، أو داخل قاعدة البيانات على Vercel (نظام ملفاته مؤقت وللقراءة فقط)
+// حفظ صورة مرفوعة في مجلد images (يُنشر مع الموقع على GitHub Pages عند الضغط على "نشر الموقع")
 function store_place_image($tmpPath, $filename, $mime) {
-    if (yanbu_is_serverless()) {
-        $data = file_get_contents($tmpPath);
-        if ($data === false) return false;
-        $stmt = yanbu_db()->prepare('INSERT INTO image_files (name, mime, data) VALUES (?, ?, ?)');
-        $stmt->bind_param('sss', $filename, $mime, $data);
-        return $stmt->execute();
-    }
     return move_uploaded_file($tmpPath, __DIR__ . '/images/' . $filename);
 }
 
@@ -86,12 +79,6 @@ function upload_too_large() {
 
 function delete_place_image_file($filename) {
     $filename = basename($filename);
-    if (yanbu_is_serverless()) {
-        $stmt = yanbu_db()->prepare('DELETE FROM image_files WHERE name = ?');
-        $stmt->bind_param('s', $filename);
-        $stmt->execute();
-        return;
-    }
     $file = __DIR__ . '/images/' . $filename;
     if ($filename !== 'placeholder.svg' && is_file($file)) @unlink($file);
 }
